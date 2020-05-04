@@ -22,14 +22,12 @@ class TextCNN(nn.Module):
                                                     kernel_size=kernel_width) 
                                          for kernel_width in self.kernel_widths])
         self.drop_out = nn.Dropout(self.dropout_rate)
-        self.fc = nn.Linear(self., class_num)
+        self.fc = nn.Linear(sum(self.output_channel_num for k in self.kernel_widths), class_num)
 
     def forward(self, input_sentences):
         """ 
         Args:
             input_sentences: torch.tensor -> shape: (batch_size, max_sent_length)
-            tags: torch.tensor -> (batch_size, max_sent_length)
-            masks: torch.tensor -> (batch_size, max_sent_length)
         """
         x = self.embedding(input_sentences).transpose(-1, -2) # X shape: (batch_size, embed_size, max_sent_length)
         x = torch.cat([self.conv_pool(conv_layer, x) for conv_layer in self.conv_layers], dim=-1) # (batch_size, output_channels_sum)
