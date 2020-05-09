@@ -1,10 +1,10 @@
-def evaluate(model, dev_data_iter max_sent_length, device):
+def evaluate(model, val_iter, device):
     was_training = model.training
     model.eval()
     val_loss = 0
     with torch.no_grad():   
         step = 0
-        for batch in iter(train_iter):
+        for batch in iter(val_iter):
             feature, target = batch.text.T, batch.label.squeeze(0)
             step += 1
             res = model(feature) 

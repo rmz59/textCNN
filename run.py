@@ -98,7 +98,7 @@ def train(config):
     train_data, val_data, test_data = SST.splits(TEXT, LABEL, root=data_path)
     if debug is True:
         train_data, _ = train_data.split(split_ratio=0.05)
-    train_iter, val_iter = torchtext.data.Iterator.splits((train_data, val_data), batch_size=batch_size)
+    train_iter, val_iter = torchtext.data.Iterator.splits((train_data, val_data), batch_size=batch_size, device=device)
 
     if (pretrained_model_file is not None) and (pretrained_model_dir is not None):
         pretrained_vector = Vectors(name=pretrained_model_file, cache=pretrained_model_dir)
@@ -143,9 +143,9 @@ def train(config):
             train_loss += loss 
             loss.backward()
             optimizer.step()
+        
+        val_loss = evaluate(model, val_iter, batch_size)
         print(f"epoch:{epoch} - train_loss:{train_loss}")
-        # val_loss = evaluate(model, val_dataset, batch_size,
-        #                     max_sent_length, device)
 
         # logging.info(
         #     f'epoch {epoch}\t train_loss: {train_loss}\t val_loss:{val_loss}\t  speed:{time.time()-train_time:.2f}s/epoch\t time elapsed {time.time()-begin_time:.2f}s')
