@@ -1,3 +1,4 @@
+import logging
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -15,7 +16,7 @@ class TextCNN(nn.Module):
         if from_pretrained is not None:
             self.embedding = nn.Embedding(embed_num, embed_dim).from_pretrained(from_pretrained)
         else:
-            self.embedding = nn.Embedding(embed_num, embed_dim).from_pretrained(from_pretrained)
+            self.embedding = nn.Embedding(embed_num, embed_dim)
 
         self.conv_layers = nn.ModuleList([nn.Conv1d(self.embed_dim, 
                                                     self.output_channel_num, 
@@ -52,13 +53,14 @@ class TextCNN(nn.Module):
         return x 
     
 
-    @staticmethod
-    def load(model_path: str):
+    @classmethod
+    def load(cls, model_path: str):
         """ Load the model from a file.
         @param model_path (str): path to model
         """
         params = torch.load(model_path, map_location=lambda storage, loc: storage)
         args = params['args']
+        model = cls(args['embed_num'], args['embed_dim'], args['class_num'], args['output_channel_num'], args['kernel_widths'])
         model.load_state_dict(params['state_dict'])
 
         return model
